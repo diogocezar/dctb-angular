@@ -1,0 +1,133 @@
+<html lang="pt-BR">
+	<link   href="./css/bootstrap.min.css" rel="stylesheet">
+	<link   href="./css/style.css"         rel="stylesheet">
+	<body ng-app="user" ng-controller="userCtrl">
+		<div class="container">
+			<div class="row voffset4">
+				<div class="col-lg-12">
+					<h3>Gerência de Usuários com Angular JS</h3>
+				</div>
+			</div>
+			<div class="row voffset4">
+				<div class="col-lg-6">
+					<button class="btn btn-success" ng-click="new()">
+						<span class="glyphicon glyphicon-user"></span> Novo Usuário
+					</button>
+				</div>
+				<div class="col-lg-6">
+					<input type="text" name="search" ng-model="search" class="pull-right" placeholder="Buscar">
+				</div>
+			</div>
+			<div class="row voffset4">
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>
+								<a href="" ng-click="order('Id')">Id</a>
+								<span class="sortorder" ng-show="predicate === 'Id'" ng-class="{reverse:reverse}"></span>
+							</th>
+							<th>
+								<a href="" ng-click="order('Name')">Nome</a>
+								<span class="sortorder" ng-show="predicate === 'Name'" ng-class="{reverse:reverse}"></span>
+							</th>
+							<th>
+								<a href="" ng-click="order('Email')">E-mail</a>
+								<span class="sortorder" ng-show="predicate === 'Email'" ng-class="{reverse:reverse}"></span>
+							</th>
+							<th>
+								<a href="" ng-click="order('DateCreate')">Criação</a>
+								<span class="sortorder" ng-show="predicate === 'DateCreate'" ng-class="{reverse:reverse}"></span>
+							</th>
+							<th>
+								<a href="" ng-click="order('DateUpdate')">Modificação</a>
+								<span class="sortorder" ng-show="predicate === 'DateUpdate'" ng-class="{reverse:reverse}"></span>
+							</th>
+							<th>Editar</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="user in users | filter: search | orderBy:orderByFunction:reverse ">
+							<td>{{ user.Id | number }}</td>
+							<td>{{ user.Name }}</td>
+							<td>{{ user.Email }}</td>
+							<td>{{ user.DateCreate }}</td>
+							<td>{{ user.DateUpdate }}</td>
+							<td>
+								<button class="btn" ng-click="edit(user.Id)">
+									<span class="glyphicon glyphicon-pencil"></span>&nbsp;&nbsp;Editar
+								</button>
+								<button class="btn" ng-click="remove(user.Id)">
+									<span class="glyphicon glyphicon-remove"></span>&nbsp;&nbsp;Excluir
+								</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<h3 ng-show="data != null">
+				{{data}}
+			</h3>
+
+			<hr>
+			<div class="row voffset1">
+				<div class="col-lg-12">
+					<h3 ng-show="!editing">Novo Usuário</h3>
+					<h3 ng-show="editing">Editar Usuário</h3>
+				</div>
+			</div>
+			<div class="row voffset1">
+				<div class="col-lg-12">
+					<form class="form-horizontal" name="userForm">
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Nome:</label>
+							<div class="col-sm-10">
+								<input type="text" name="name" ng-model="user.Name" ng-disabled="user.edit" placeholder="Nome" required>
+								<span style="color:red" ng-show="userForm.name.$dirty && userForm.name.$invalid">
+									<span ng-show="userForm.name.$error.required">Preencha o nome.</span>
+								</span>
+							</div>
+						</div> 
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Email:</label>
+							<div class="col-sm-10">
+								<input type="email" name="email" ng-model="user.Email" ng-disabled="user.edit" placeholder="Email" required>
+								<span style="color:red" ng-show="userForm.email.$dirty && userForm.email.$invalid">
+									<span ng-show="userForm.email.$error.required">Preencha o e-mail.</span>
+									<span ng-show="userForm.email.$error.email">E-mail inválido.</span>
+								</span>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Senha:</label>
+							<div class="col-sm-10">
+								<input type="password" name="pwd1" ng-model="user.Pwd1" placeholder="Senha" required>
+								<span style="color:red" ng-show="userForm.pwd1.$dirty && userForm.pwd1.$invalid">
+									<span ng-show="userForm.pwd1.$error.required">Preencha a senha.</span>
+								</span>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Confirmação:</label>
+							<div class="col-sm-10">
+								<input type="password" name="pwd2" ng-model="user.Pwd2" placeholder="Confirmação de Senha" required>
+								<span style="color:red" ng-show="(userForm.pwd2.$dirty && userForm.pwd2.$invalid) || (userForm.pwd2.$dirty && confirmation)">
+									<span ng-show="userForm.pwd2.$error.required">Preencha a confirmação de senha.</span>
+									<span ng-show="confirmation">As senhas não conferem.</span>
+								</span>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+			<hr>
+			<button class="btn btn-success" ng-disabled="have_error" ng-click="save()">
+				<span class="glyphicon glyphicon-save"></span> Salvar
+			</button>
+		</div>
+
+		<script src="./js/jquery.js"></script>
+		<script src="./js/angular.min.js"></script>
+		<script src="./objects/user.js"></script>
+	</body>
+</html>

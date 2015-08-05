@@ -1,0 +1,169 @@
+<html lang="pt-BR">
+	<script src="./js/jquery.js"></script>
+	<script src="./js/angular.min.js"></script>
+	<script src="./js/angular-locale_pt-br.js"></script>
+	<body ng-app="ang">
+
+		<h1>Angular</h1>
+
+		<div ng-init="person={firstName:'John',lastName:'Doe'}">
+			<p>The name is <span ng-bind="person.lastName"></span></p>
+		</div>
+
+		<div ng-init="names1=['Jani','Hege','Kai']">
+			<ul>
+				<li ng-repeat="x in names1">
+					{{ x }}
+				</li>
+			</ul>
+		</div>
+
+		<div ng-init="names2=[
+							{name:'Jani',country:'Norway'},
+							{name:'Hege',country:'Sweden'},
+							{name:'Kai',country:'Denmark'}
+							]">
+			<ul>
+				<li ng-repeat="x in names2">
+					{{ x.name + ', ' + x.country }}
+				</li>
+			</ul>
+		</div>
+
+		<div ng-controller="angCtrl1">
+			First Name: <input type="text" ng-model="firstName"><br>
+			Last Name: <input type="text" ng-model="lastName"><br>
+			<br>
+			Full Name: {{fullName()}}
+			<p>The name is {{ lastName | uppercase }}</p>
+			<p>The name is {{ lastName | lowercase }}</p>
+			<p>The name is {{ val | currency  }}</p>
+			<ul>
+			  <li ng-repeat="x in db | orderBy:'city'">
+			    {{ x.name + ', ' + x.city }}
+			  </li>
+			</ul>
+			<p><input type="text" ng-model="search" placeHolder="search"></p>
+
+			<ul>
+			  <li ng-repeat="x in db | filter: search | orderBy:'city'">
+			    {{ ( x.name | uppercase ) + ' - ' + x.city }}
+			  </li>
+			</ul>
+		</div>
+
+		<div ng-controller="angCtrl2">
+			<p><input type="text" ng-model="search" placeHolder="search"></p>
+			<ul ng-show="control_toggle">
+			  <li ng-repeat="x in db | filter: search | orderBy:'id'">
+			    {{ x.id  + ' - ' + ( x.name | lowercase ) }}
+			  </li>
+			</ul>
+			<button ng-click="toggle()">Toggle</button>
+		</div>
+
+		<p>
+			<button ng-disabled="mySwitch">Click Me!</button>
+		</p>
+
+		<p>
+			<input type="checkbox" ng-model="mySwitch">Button
+		</p>
+
+		<div ng-app="">
+			<p ng-show="true">I am visible.</p>
+			<p ng-show="false">I am not visible.</p>
+		</div>
+
+		<div ng-controller="angCtrl3">
+			<p><input type="text" ng-model="varId" ng-change="update()"></p>
+			<form name="userForm" novalidate>
+				<label for="id_id">Id</label>
+				<input type="text" name="id_id" id="id_id" ng-model="user.Id">
+				<label for="id_name">Name</label>
+				<input type="text" id="id_name" name="id_name" ng-model="user.Name" required>
+				<span style="color:red" ng-show="userForm.id_name.$dirty && userForm.id_name.$invalid">
+					<span ng-show="userForm.id_name.$error.required">Username is required.</span>
+				</span>
+				<label for="id_email">E-mail</label>
+				<input type="email" name="id_email" id="id_email" ng-model="user.Email" required>
+				<span style="color:red" ng-show="userForm.id_email.$dirty && userForm.id_email.$invalid">
+					<span ng-show="userForm.id_email.$error.required">Email is required.</span>
+					<span ng-show="userForm.id_email.$error.email">Invalid email address.</span>
+				</span>
+				<p>
+					<input type="button" value="Ok"
+					ng-disabled="userForm.id_name.$dirty && userForm.id_name.$invalid ||
+					             userForm.id_email.$dirty && userForm.id_email.$invalid">
+				</p>
+			</form>
+		</div>
+
+		<script>
+			Angular = {
+				app : null,
+				// Init
+				init: function(){
+					Angular.app = angular.module('ang', []);
+					Angular.bindControllers();
+				},
+				// Bind Controllers
+				bindControllers : function(){
+					Angular.app.controller('angCtrl1', function($scope) {
+    					Angular.angCtrl1.init($scope);
+					});
+					Angular.app.controller('angCtrl2', function($scope, $http) {
+    					Angular.angCtrl2.init($scope, $http);
+					});
+					Angular.app.controller('angCtrl3', function($scope, $http) {
+    					Angular.angCtrl3.init($scope, $http);
+					});
+				},
+				// Controllers
+				angCtrl1: {
+					init: function($scope){
+						$scope.firstName = "John";
+    					$scope.lastName  = "Doe";
+    					$scope.val       = 1238.67;
+    					$scope.db        = [
+    						{ name : 'Diogo Cezar', city: 'Cornélio Procópio'},
+    						{ name : 'Fernando',    city: 'Andirá'},
+    						{ name : 'José',        city: 'São Paulo'},
+    						{ name : 'Murilo',      city: 'Florianópolis'},
+    						{ name : 'Jorge',       city: 'Petrolina'}
+    					];
+    					$scope.fullName  = function(){ return Angular.angCtrl1.fullName($scope) };
+					},
+					fullName: function($scope){
+						return $scope.firstName + " " + $scope.lastName;
+					}
+				},
+				angCtrl2: {
+					init: function($scope, $http){
+						$http.get("data.php?method=get_types").success(function(response){
+							$scope.db = response.records;
+						});
+						$scope.control_toggle = true;
+						$scope.toggle         = function(){ Angular.angCtrl2.toggle($scope) };
+					},
+					toggle: function($scope){
+						$scope.control_toggle = !$scope.control_toggle;
+					}
+				},
+				angCtrl3: {
+					init: function($scope, $http){
+						$scope.varId = 1;
+						$scope.update = function(){ Angular.angCtrl3.get_data($scope, $http); }
+						Angular.angCtrl3.get_data($scope, $http);
+					},
+					get_data: function($scope, $http){
+						$http.get("data.php?method=get_user&id=" + $scope.varId).success(function(response){
+							$scope.user = response.record;
+						});
+					}
+				},
+			}
+			Angular.init();
+		</script>
+	</body>
+</html>
